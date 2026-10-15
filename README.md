@@ -1,7 +1,7 @@
 # HeliPort
 ![image](AppIcon-128.png)
 
-Intel WiFi Client for [itlwm]([https://github.com/jzrodriguez98/itlwm)](https://github.com/jzrodriguez98/itlwm)
+Intel WiFi Client for (https://github.com/jzrodriguez98/itlwm)
 
 ## Download
 
@@ -15,7 +15,7 @@ Intel WiFi Client for [itlwm]([https://github.com/jzrodriguez98/itlwm)](https://
 
 ## Status
 
-HeliPort has been upgraded to **Version 2.0**, providing a state-of-the-art premium experience for Intel-based Macs. The app requires **macOS 13.0 (Ventura)** or newer and features a completely redesigned, high-fidelity user interface.
+HeliPort has been upgraded, providing a state-of-the-art premium experience for Intel-based Macs. The app requires **macOS 13.0 (Ventura)** or newer and features a completely redesigned, high-fidelity user interface.
 
 ### New Features
 - **📊 Advanced Telemetry**: Real-time signal strength history with high-frequency sampling (30 data points) and smoothed interpolation.
@@ -28,8 +28,8 @@ HeliPort has been upgraded to **Version 2.0**, providing a state-of-the-art prem
 - [x] Redesigned Dashboard
 - [x] Implement always-available technical telemetry (Noise, PHY, Channel)
 - [x] Enhance Signal Strength Charting (30 data points)
-- [x] Update project version to 2.0
 - [x] Optimized Intel-only (x86_64) Architecture
+- [ ] Apple Silicon Support (because why not) - coming soon
 
 
 Visit [Projects](https://github.com/OpenIntelWireless/HeliPort/projects) for more information.
