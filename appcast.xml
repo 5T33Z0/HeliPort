@@ -3,16 +3,19 @@
     <channel>
         <title>HeliPort</title>
         <item>
-            <title>2.4</title>
-            <pubDate>Thu, 15 Oct 2026 09:32:13 +0000</pubDate>
-            <sparkle:version>362</sparkle:version>
-            <sparkle:shortVersionString>2.4</sparkle:shortVersionString>
+            <title>2.5</title>
+            <pubDate>Thu, 15 Oct 2026 09:43:26 +0000</pubDate>
+            <sparkle:version>365</sparkle:version>
+            <sparkle:shortVersionString>2.5</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
             <description><![CDATA[
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/19.4.0/primer.min.css"><meta charset="UTF-8">
                 <div class="markdown-body">
                     <h3>The latest updates are:</h3>
                     <ul>
+                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/9bfb3d51a212cb5d0a09dc16d30c9113fd2fd14d"><tt>9bfb3d5</tt></a> Merge branch &apos;master&apos; of https://github.com/joshcalvert47/HeliPort</li>
+                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/1d987fe9b5d135040a7a128653452c5d266306af"><tt>1d987fe</tt></a> fix version</li>
+                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/2dc1f6e4a511306bc9d4026d504b7f102ff5fe3d"><tt>2dc1f6e</tt></a> chore: update appcast.xml [skip ci]</li>
                     <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/6db03cc195394f50f66b536d73f65ac5c1fcafb5"><tt>6db03cc</tt></a> update version</li>
                     <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/544b5dd7851beb29f3e496957cb5fca4ddb6575f"><tt>544b5dd</tt></a> Merge branch &apos;master&apos; of https://github.com/joshcalvert47/HeliPort</li>
                     <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/3185d197941bf483253a48fc76d53e6f2e4b80af"><tt>3185d19</tt></a> Simulated WiFi Driver</li>
@@ -30,7 +33,7 @@
                     </ul>
                 </div>
             ]]></description>
-            <enclosure url="https://github.com/bigj42/heliport/releases/download/v2.4/HeliPort.dmg" type="application/octet-stream" sparkle:edSignature="QSHpl/Zxj/vI2n3J1W5kqRVxgWL9gAQKBpkNwsPI62UFQOqT8YCWBR0Aoor/2eSyrG6ezmySlhKTogKzVAVrCw==" length="2129488"/>
+            <enclosure url="https://github.com/bigj42/heliport/releases/download/v2.5/HeliPort.dmg" type="application/octet-stream" sparkle:edSignature="uv62kSLbfJg0LXUGBwybvtjs2PBEQsYj1EIbtoN0p/7PmHCSP692wFhHKyO1nsX07TLaHt1dzjKUpsIBP71gAw==" length="2129522"/>
         </item>
     </channel>
 </rss>
