@@ -43,8 +43,8 @@
 		50F495AC24BDEBB500AE4C08 /* HeliPort Launcher.app in Embed Launcher */ = {isa = PBXBuildFile; fileRef = 50F4959D24BDEB6500AE4C08 /* HeliPort Launcher.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7562BBE424826103008A9BD2 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7562BBE324826102008A9BD2 /* README.md */; };
 		75FDF38B2481D22000B2A601 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75FDF38A2481D22000B2A601 /* NetworkManager.swift */; };
-		AA11BB22CC33DD44EE550001 /* SimulatedDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE550002 /* SimulatedDriver.swift */; };
 		75FDF38C2481D25A00B2A601 /* Api.c in Sources */ = {isa = PBXBuildFile; fileRef = F8F6CF0B243D675800965B43 /* Api.c */; };
+		AA11BB22CC33DD44EE550001 /* SimulatedDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE550002 /* SimulatedDriver.swift */; };
 		BCCB2AA4243708090005BB82 /* WiFiMenuItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB2AA3243708090005BB82 /* WiFiMenuItemView.swift */; };
 		BCFA32EB2424D2BE00E23603 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA32EA2424D2BE00E23603 /* AppDelegate.swift */; };
 		BCFA32ED2424D2BF00E23603 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCFA32EC2424D2BF00E23603 /* Assets.xcassets */; };
@@ -788,7 +788,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.joshc.HeliPort;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -817,7 +817,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.3.0;
+				MARKETING_VERSION = 2.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.joshc.HeliPort;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
