@@ -105,7 +105,7 @@ class PrefsWindow: NSWindow {
         case .debug:
             if #available(macOS 11.0, *) {
                 newView = NSHostingView(rootView: PrefsDebugView())
-                size = NSSize(width: 540, height: 320)
+                size = NSSize(width: 540, height: 430)
             } else {
                 Log.error("Debug view requires macOS 11.0+")
                 return
@@ -206,9 +206,10 @@ private extension String {
 
 struct PrefsDebugView: View {
     @State private var isGeneratingReport = false
+    @AppStorage(SimulationMode.defaultsKey) private var simulationEnabled = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Diagnostics & Debugging")
                 .font(.headline)
 
@@ -218,51 +219,103 @@ struct PrefsDebugView: View {
 
             Divider()
 
-            VStack(spacing: 12) {
-                DebugActionButton(
-                    title: "Enable Wi-Fi Logging",
-                    icon: "terminal",
-                    description: "Captures detailed driver and firmware logs."
-                ) {
-                    // Not implemented in driver yet according to StatusMenuLegacy
-                }
-                .disabled(true)
+            simulationModeCard
 
-                DebugActionButton(
-                    title: "Create Diagnostics Report...",
-                    icon: "doc.text.fill",
-                    description: "Generates a comprehensive system report for debugging.",
-                    isLoading: isGeneratingReport
-                ) {
-                    isGeneratingReport = true
-                    DispatchQueue.global(qos: .background).async {
-                        BugReporter.generateBugReport()
-                        DispatchQueue.main.async {
-                            isGeneratingReport = false
-                        }
-                    }
+            if #available(macOS 26.0, *) {
+                GlassEffectContainer(spacing: 12) {
+                    debugActions
                 }
-
-                DebugActionButton(
-                    title: "Open Wireless Diagnostics...",
-                    icon: "stethoscope",
-                    description: "Opens the native macOS Wireless Diagnostics tool."
-                ) {
-                    let appURL = URL(
-                        fileURLWithPath: "/System/Library/CoreServices/Applications/Wireless Diagnostics.app"
-                    )
-                    NSWorkspace.shared.openApplication(
-                        at: appURL,
-                        configuration: NSWorkspace.OpenConfiguration(),
-                        completionHandler: nil
-                    )
-                }
+            } else {
+                debugActions
             }
 
             Spacer()
         }
         .padding(30)
-        .frame(width: 540, height: 320)
+        .frame(width: 540, height: 430)
+    }
+
+    /// Runs HeliPort without the itlwm driver (Apple Silicon, CI, UI work).
+    private var simulationModeCard: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.accentColor.opacity(0.1))
+                    .frame(width: 40, height: 40)
+
+                Image(systemName: "wifi.exclamationmark")
+                    .font(.system(size: 18))
+                    .foregroundColor(.accentColor)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Simulation Mode")
+                    .font(.system(size: 13, weight: .semibold))
+                Text(simulationEnabled
+                     ? "Using simulated Wi-Fi data - no itlwm driver required."
+                     : "Run without the itlwm driver using simulated Wi-Fi data.")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            Button("Relaunch") {
+                NSApp.restartApp()
+            }
+            .controlSize(.small)
+
+            Toggle("", isOn: $simulationEnabled)
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .controlSize(.small)
+        }
+        .padding(10)
+        .heliPortGlassCard(cornerRadius: 10, interactive: true)
+    }
+
+    @ViewBuilder
+    private var debugActions: some View {
+        VStack(spacing: 12) {
+            DebugActionButton(
+                title: "Enable Wi-Fi Logging",
+                icon: "terminal",
+                description: "Captures detailed driver and firmware logs."
+            ) {
+                // Not implemented in driver yet according to StatusMenuLegacy
+            }
+            .disabled(true)
+
+            DebugActionButton(
+                title: "Create Diagnostics Report...",
+                icon: "doc.text.fill",
+                description: "Generates a comprehensive system report for debugging.",
+                isLoading: isGeneratingReport
+            ) {
+                isGeneratingReport = true
+                DispatchQueue.global(qos: .background).async {
+                    BugReporter.generateBugReport()
+                    DispatchQueue.main.async {
+                        isGeneratingReport = false
+                    }
+                }
+            }
+
+            DebugActionButton(
+                title: "Open Wireless Diagnostics...",
+                icon: "stethoscope",
+                description: "Opens the native macOS Wireless Diagnostics tool."
+            ) {
+                let appURL = URL(
+                    fileURLWithPath: "/System/Library/CoreServices/Applications/Wireless Diagnostics.app"
+                )
+                NSWorkspace.shared.openApplication(
+                    at: appURL,
+                    configuration: NSWorkspace.OpenConfiguration(),
+                    completionHandler: nil
+                )
+            }
+        }
     }
 }
 
@@ -306,8 +359,7 @@ struct DebugActionButton: View {
                     .foregroundColor(.secondary.opacity(0.3))
             }
             .padding(10)
-            .background(Color.primary.opacity(0.03))
-            .cornerRadius(10)
+            .heliPortGlassCard(cornerRadius: 10, interactive: true)
         }
         .buttonStyle(PlainButtonStyle())
     }

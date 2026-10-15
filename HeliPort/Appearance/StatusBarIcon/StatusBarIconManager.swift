@@ -74,9 +74,8 @@ class StatusBarIcon {
             guard self.timer == nil else { return }
             self.tickIndex = 0
             self.tickDirection = 1
-            let timer = Timer(timeInterval: 0.3, repeats: true) { [weak self] _ in
-                self?.tick()
-            }
+            let timer = Timer(timeInterval: 0.3, target: self, selector: #selector(self.tick),
+                              userInfo: nil, repeats: true)
             // .common keeps the animation running while the menu is open.
             RunLoop.main.add(timer, forMode: .common)
             self.timer = timer
@@ -138,10 +137,8 @@ class StatusBarIcon {
     }
 
     private func perform(_ block: @escaping () -> Void) {
-        if Thread.isMainThread {
-            block()
-        } else {
-            DispatchQueue.main.async(execute: block)
-        }
+        // Always hop through the main queue, even when already on the main thread,
+        // so successive state changes are applied strictly in call order.
+        DispatchQueue.main.async(execute: block)
     }
 }

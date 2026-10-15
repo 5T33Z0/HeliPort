@@ -38,13 +38,16 @@ jobs:
         CUR_TAG="$(git tag -l | grep -i 'alpha' | tail -1)"
         eval $(grep -m 1 "MARKETING_VERSION =" HeliPort.xcodeproj/project.pbxproj | tr -d ';' | tr -d '\t' | tr -d " ")
 
-        if [[ "$GITHUB_EVENT_NAME" != 'workflow_dispatch' ]]; then
-          sed -i '' -e "s/CURRENT_PROJECT_VERSION =.*/CURRENT_PROJECT_VERSION = \"$(MARKETING_VERSION)-alpha-${GIT_SHA}\";/g" HeliPort.xcodeproj/project.pbxproj
-        else
-          sed -i '' -e "s/CURRENT_PROJECT_VERSION =.*/CURRENT_PROJECT_VERSION = \"$(MARKETING_VERSION)-stable-${GIT_SHA}\";/g" HeliPort.xcodeproj/project.pbxproj
-        fi
+        # Sparkle compares the bundle's CFBundleVersion against the appcast's
+        # sparkle:version and stops parsing at the first non-numeric separator, so
+        # a "-alpha-<sha>" suffix is ignored and every build compares as the same
+        # version ("always up to date"). Give the app and the appcast the same
+        # monotonically increasing numeric build number instead.
+        BUILD_NUMBER="$(git rev-list --count HEAD)"
+        sed -i '' -e "s/CURRENT_PROJECT_VERSION =.*/CURRENT_PROJECT_VERSION = ${BUILD_NUMBER};/g" HeliPort.xcodeproj/project.pbxproj
 
         echo "VER=$MARKETING_VERSION" >> $GITHUB_ENV
+        echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
         echo "SHORT_SHA=$GIT_SHA" >> $GITHUB_ENV
         if [[ -z $CUR_TAG ]]; then
           echo "OLD_PRE_TAG=NULL" >> $GITHUB_ENV
@@ -218,7 +221,8 @@ jobs:
         PUBDATE="$(date +"%a, %d %b %Y %T %z")"
         DMG_URL="${REPO_BASE}/releases/download/${REL_TAG}/HeliPort.dmg"
         SPARKLE_SHORT="${VER}"
-        SPARKLE_BUILD="${VER}-${SHORT_SHA}"
+        # Must match CURRENT_PROJECT_VERSION exactly and increase every release.
+        SPARKLE_BUILD="${BUILD_NUMBER}"
 
         SIGN_RESULT=""
         if [[ -n "${SPARKLE_KEY}" ]]; then
@@ -248,6 +252,9 @@ jobs:
                 <item>
                     <title>${VER}</title>
                     <pubDate>${PUBDATE}</pubDate>
+                    <sparkle:version>${SPARKLE_BUILD}</sparkle:version>
+                    <sparkle:shortVersionString>${SPARKLE_SHORT}</sparkle:shortVersionString>
+                    <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
                     <description><![CDATA[
                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/19.4.0/primer.min.css"><meta charset="UTF-8">
                         <div class="markdown-body">
@@ -257,8 +264,7 @@ jobs:
                             </ul>
                         </div>
                     ]]></description>
-                    <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
-                    <enclosure url="${DMG_URL}" sparkle:version="${SPARKLE_BUILD}" sparkle:shortVersionString="${SPARKLE_SHORT}" type="application/octet-stream" ${SIGN_RESULT}/>
+                    <enclosure url="${DMG_URL}" type="application/octet-stream" ${SIGN_RESULT}/>
                 </item>
             </channel>
         </rss>

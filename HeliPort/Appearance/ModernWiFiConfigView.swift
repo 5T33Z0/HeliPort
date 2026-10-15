@@ -57,9 +57,14 @@ struct ModernWiFiConfigView: View {
                                 .textFieldStyle(PlainTextFieldStyle())
                         }
 
-                        Button(action: { showPassword.toggle() }, label: {
+                        Button(action: {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                                showPassword.toggle()
+                            }
+                        }, label: {
                             Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
                                 .foregroundColor(.secondary)
+                                .contentTransition(.opacity)
                         })
                         .buttonStyle(PlainButtonStyle())
                     }
@@ -79,6 +84,8 @@ struct ModernWiFiConfigView: View {
                     .toggleStyle(CheckboxToggleStyle())
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .padding(16)
+            .heliPortGlassCard(cornerRadius: 14)
             .padding(.horizontal, 24)
 
             Spacer()
@@ -95,14 +102,14 @@ struct ModernWiFiConfigView: View {
                 Button("Cancel") {
                     onCancel()
                 }
-                .buttonStyle(BorderedButtonStyle())
+                .heliPortButtonStyle()
                 .controlSize(.large)
 
                 Button("Join") {
                     isConnecting = true
                     onJoin(password, rememberNetwork)
                 }
-                .buttonStyle(BorderedProminentButtonStyle())
+                .heliPortProminentButtonStyle()
                 .controlSize(.large)
                 .disabled(password.count < 8 || isConnecting)
             }

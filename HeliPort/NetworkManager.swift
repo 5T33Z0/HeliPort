@@ -39,7 +39,7 @@ final class NetworkManager {
         let getAuthInfoCallback: (_ auth: NetworkAuth, _ savePassword: Bool) -> Void = { auth, savePassword in
             DispatchQueue.global(qos: .background).async {
                 StatusBarIcon.shared().connecting()
-                let result = connect_network(networkInfo.ssid, auth.password)
+                let result = Driver.connect(ssid: networkInfo.ssid, password: auth.password)
                 DispatchQueue.main.async {
                     if result {
                         if savePassword {
@@ -105,29 +105,7 @@ final class NetworkManager {
 
     private static func scanNetwork(callback: @escaping (_ networkInfoList: Set<NetworkInfo>) -> Void) {
         DispatchQueue.global(qos: .background).async {
-            var list = network_info_list_t()
-            get_network_list(&list)
-
-            var result = Set<NetworkInfo>()
-            let networks = Mirror(reflecting: list.networks).children.map({ $0.value }).prefix(Int(list.count))
-
-            for element in networks {
-                guard let network = element as? ioctl_network_info else {
-                    continue
-                }
-                let ssid = String(ssid: network.ssid)
-                guard !ssid.isEmpty else {
-                    continue
-                }
-
-                let networkInfo = NetworkInfo(
-                    ssid: ssid,
-                    rssi: Int(network.rssi)
-                )
-                networkInfo.auth.security = getSecurityType(network)
-                result.insert(networkInfo)
-            }
-
+            let result = Driver.networkList()
             DispatchQueue.main.async {
                 callback(result)
             }

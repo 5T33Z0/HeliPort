@@ -113,10 +113,12 @@ class BugReporter {
 
         // MARK: itlwm log
 
-        var drv_info = ioctl_driver_info()
-        _ = ioctl_get(Int32(IOCTL_80211_DRIVER_INFO.rawValue), &drv_info, MemoryLayout<ioctl_driver_info>.size)
-        var itlwmVer = String(cCharArray: drv_info.driver_version)
-        var itlwmFwVer = String(cCharArray: drv_info.fw_version)
+        var itlwmVer = ""
+        var itlwmFwVer = ""
+        if let drvInfo = Driver.driverInfo() {
+            itlwmVer = String(cCharArray: drvInfo.driver_version)
+            itlwmFwVer = String(cCharArray: drvInfo.fw_version)
+        }
         if itlwmVer.isEmpty { itlwmVer = "Unknown" }
         if itlwmFwVer.isEmpty { itlwmFwVer = "Unknown" }
 

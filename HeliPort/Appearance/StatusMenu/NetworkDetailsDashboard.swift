@@ -169,12 +169,7 @@ struct NetworkDetailsDashboard: View {
             }
         }
         .padding(16)
-        .background(Color.primary.opacity(0.03))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.primary.opacity(0.08), lineWidth: 0.5)
-        )
+        .heliPortGlassCard(cornerRadius: 16)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
     }

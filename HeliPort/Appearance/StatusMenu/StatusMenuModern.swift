@@ -7,7 +7,7 @@ final class StatusMenuModern: StatusMenuBase, StatusMenuItems {
     // - MARK: SwiftUI State
     private var isWiFiOn: Bool = true {
         didSet {
-            _ = isWiFiOn ? power_on() : power_off()
+            Driver.setPower(isWiFiOn)
         }
     }
 
@@ -138,6 +138,7 @@ final class StatusMenuModern: StatusMenuBase, StatusMenuItems {
     private var knownNetworkItemList = [NSMenuItem]()
     private var otherNetworkItemList = [NSMenuItem]()
     private var currentSSID: String?
+    private var isNetworkScanInFlight = false
     private lazy var dashboardViewModel = NetworkDetailsViewModel()
 
     // - MARK: Init
@@ -211,6 +212,11 @@ final class StatusMenuModern: StatusMenuBase, StatusMenuItems {
     func updateNetworkList() {
         guard isNetworkCardEnabled else { return }
 
+        // The update timer fires every few seconds; skip a tick while the previous
+        // scan is still running so late results cannot overwrite a newer list.
+        guard !isNetworkScanInFlight else { return }
+        isNetworkScanInFlight = true
+
         (otherSectionItem as? ModernSectionHeaderItem)?.isScanning = true
         (knownSectionItem as? ModernSectionHeaderItem)?.isScanning = true
 
@@ -222,6 +228,7 @@ final class StatusMenuModern: StatusMenuBase, StatusMenuItems {
             let networkListSize = knownList.count + otherList.count
 
             DispatchQueue.main.async {
+                self.isNetworkScanInFlight = false
                 (self.otherSectionItem as? ModernSectionHeaderItem)?.isScanning = false
                 (self.knownSectionItem as? ModernSectionHeaderItem)?.isScanning = false
 

@@ -32,6 +32,6 @@ class SparkleDelegate: NSObject, SPUUpdaterDelegate {
 
     func updaterWillRelaunchApplication(_ updater: SPUUpdater) {
         Log.debug("App will relaunch to install update")
-        api_terminate()
+        Driver.terminate()
     }
 }

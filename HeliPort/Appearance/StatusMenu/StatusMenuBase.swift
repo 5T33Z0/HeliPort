@@ -62,11 +62,10 @@ class StatusMenuBase: NSMenu, NSMenuDelegate {
             case ITL80211_S_RUN:
                 DispatchQueue.global(qos: .background).async {
                     let isReachable = NetworkManager.isReachable()
-                    var staInfo = station_info_t()
-                    get_station_info(&staInfo)
+                    let rssi = Driver.stationInfo()?.rssi ?? -70
                     DispatchQueue.main.async {
                         guard isReachable else { StatusBarIcon.shared().warning(); return }
-                        StatusBarIcon.shared().signalStrength(rssi: staInfo.rssi)
+                        StatusBarIcon.shared().signalStrength(rssi: rssi)
                     }
                 }
             case ITL80211_S_SCAN:
@@ -188,22 +187,27 @@ class StatusMenuBase: NSMenu, NSMenuDelegate {
         (self as? StatusMenuItems)?.setupMenu()
         getDeviceInfo()
 
-        DispatchQueue.global(qos: .default).async {
-            self.statusUpdateTimer = Timer.scheduledTimer(
-                timeInterval: self.statusUpdatePeriod,
-                target: self,
-                selector: #selector(self.updateStatus),
-                userInfo: nil,
-                repeats: true
-            )
-
-            self.statusUpdateTimer?.fire()
-            let currentRunLoop = RunLoop.current
-            currentRunLoop.add(self.statusUpdateTimer!, forMode: .common)
-            currentRunLoop.run()
-        }
+        startTimer(&statusUpdateTimer, interval: statusUpdatePeriod, selector: #selector(updateStatus))
 
         NSApp.servicesProvider = self
+    }
+
+    /// Schedules a repeating timer on the main run loop in `.common` mode.
+    /// Running on the main run loop keeps the timer callbacks on the UI thread
+    /// (some of them mutate menu items and SwiftUI hosted views) while `.common`
+    /// mode keeps them firing while the status menu is tracking.
+    private func startTimer(_ timer: inout Timer?, interval: Double, selector: Selector) {
+        guard timer == nil else { return }
+        let newTimer = Timer(timeInterval: interval, target: self, selector: selector,
+                             userInfo: nil, repeats: true)
+        RunLoop.main.add(newTimer, forMode: .common)
+        timer = newTimer
+        newTimer.fire()
+    }
+
+    private func stopTimer(_ timer: inout Timer?) {
+        timer?.invalidate()
+        timer = nil
     }
 
     required init(coder: NSCoder) {
@@ -221,25 +225,15 @@ class StatusMenuBase: NSMenu, NSMenuDelegate {
         isMenuOpen = true
         showAllOptions = (NSApp.currentEvent?.modifierFlags.contains(.option)) ?? false
 
-        DispatchQueue.global(qos: .default).async {
-            self.updateStationItems()
-            self.networkListUpdateTimer = Timer.scheduledTimer(
-                timeInterval: self.networkListUpdatePeriod,
-                target: self,
-                selector: #selector(self.updateNetworkList),
-                userInfo: nil,
-                repeats: true
-            )
-            self.networkListUpdateTimer?.fire()
-            let currentRunLoop = RunLoop.current
-            currentRunLoop.add(self.networkListUpdateTimer!, forMode: .common)
-            currentRunLoop.run()
-        }
+        updateStationItems()
+        startTimer(&networkListUpdateTimer,
+                   interval: networkListUpdatePeriod,
+                   selector: #selector(updateNetworkList))
     }
 
     func menuDidClose(_ menu: NSMenu) {
         isMenuOpen = false
-        networkListUpdateTimer?.invalidate()
+        stopTimer(&networkListUpdateTimer)
         (menu.highlightedItem?.view as? SelectableMenuItemView)?.isMouseOver = false
     }
 
@@ -271,15 +265,13 @@ class StatusMenuBase: NSMenu, NSMenuDelegate {
             var bsdName: String = .unavailable
             var macAddr: String = .unavailable
             var itlwmVer: String = .unavailable
-            var platformInfo = platform_info_t()
-
-            if is_power_on() {
+            if Driver.powerState() == true {
                 Log.debug("Wi-Fi powered on")
             } else {
                 Log.debug("Wi-Fi powered off")
             }
 
-            if get_platform_info(&platformInfo) {
+            if let platformInfo = Driver.platformInfo() {
                 bsdName = String(cCharArray: platformInfo.device_info_str)
                 macAddr = NetworkManager.getMACAddressFromBSD(bsd: bsdName) ?? macAddr
                 itlwmVer = String(cCharArray: platformInfo.driver_info_str)
@@ -294,12 +286,10 @@ class StatusMenuBase: NSMenu, NSMenuDelegate {
             }
 
             // If not connected, try to connect saved networks
-            var stationInfo = station_info_t()
-            var state: UInt32 = 0
-            var power: Bool = false
-            get_power_state(&power)
-            if get_80211_state(&state) && power &&
-                (state != ITL80211_S_RUN.rawValue || get_station_info(&stationInfo) != KERN_SUCCESS) {
+            let power = Driver.powerState() ?? false
+            let state = Driver.state()
+            if power, let state,
+               state != ITL80211_S_RUN || Driver.stationInfo() == nil {
                 NetworkManager.scanSavedNetworks()
             }
         }
@@ -321,9 +311,9 @@ class StatusMenuBase: NSMenu, NSMenuDelegate {
                 }
             }
         case .Legacy.turnWiFiOn:
-            power_on()
+            Driver.setPower(true)
         case .Legacy.turnWiFiOff:
-            power_off()
+            Driver.setPower(false)
         case .Legacy.joinNetworks, .Modern.joinNetworks:
             let joinPop = WiFiConfigWindow()
             joinPop.show()
@@ -392,19 +382,17 @@ class StatusMenuBase: NSMenu, NSMenuDelegate {
         lastStatusUpdateTime = Date()
 
         DispatchQueue.global(qos: .background).async {
-            var powerState: Bool = false
-            let get_power_ret = get_power_state(&powerState)
-            var status: UInt32 = 0xFF
-            let get_state_ret = get_80211_state(&status)
+            let powerState = Driver.powerState()
+            let status = Driver.state()
 
             DispatchQueue.main.async {
-                if get_power_ret && get_state_ret {
+                if let powerState, let status {
                     self.isNetworkCardEnabled = powerState
+                    self.driverState = status
                 } else {
                     Log.error("Failed get card state")
                 }
-                self.isNetworkCardAvailable = get_power_ret
-                self.driverState = itl_80211_state(rawValue: status)
+                self.isNetworkCardAvailable = powerState != nil
                 self.updateStationItems()
             }
         }
@@ -450,10 +438,9 @@ class StatusMenuBase: NSMenu, NSMenuDelegate {
 
     private func getStationInfo() -> StationInfo {
         var infoOut = StationInfo()
-        var infoIn = station_info_t()
 
         guard driverState == ITL80211_S_RUN,
-              get_station_info(&infoIn) == KERN_SUCCESS else {
+              let infoIn = Driver.stationInfo() else {
             return infoOut
         }
 
@@ -461,8 +448,7 @@ class StatusMenuBase: NSMenu, NSMenuDelegate {
         infoOut.ssid = String(ssid: infoIn.ssid)
         infoOut.rssiValue = Int(infoIn.rssi)
 
-        var platformInfo = platform_info_t()
-        if get_platform_info(&platformInfo) {
+        if let platformInfo = Driver.platformInfo() {
             let bsd = String(cCharArray: platformInfo.device_info_str)
             infoOut.ipAddr = NetworkManager.getLocalAddress(bsd: bsd) ?? .unknown
             infoOut.routerAddr = NetworkManager.getRouterAddress(bsd: bsd) ?? .unknown

@@ -80,3 +80,50 @@ struct VisualEffectView: NSViewRepresentable {
         nsView.blendingMode = blendingMode
     }
 }
+
+// MARK: - Liquid Glass
+//
+// macOS 26 introduces the Liquid Glass design language. These helpers use the
+// native APIs when available and fall back to materials on earlier systems, so
+// the app keeps its deployment target of macOS 13.
+
+extension View {
+    /// Renders a glass surface in `shape` on macOS 26+, or a material surface below it.
+    @ViewBuilder
+    func heliPortGlass<S: Shape>(in shape: S, interactive: Bool = false) -> some View {
+        if #available(macOS 26.0, *) {
+            self.glassEffect(interactive ? .regular.interactive() : .regular, in: shape)
+        } else {
+            self
+                .background(.ultraThinMaterial, in: shape)
+                .overlay(shape.stroke(SwiftUI.Color.primary.opacity(0.08), lineWidth: 0.5))
+        }
+    }
+
+    /// Convenience wrapper around ``heliPortGlass(in:interactive:)`` for rounded cards.
+    func heliPortGlassCard(cornerRadius: CGFloat = HeliPortUI.Radius.large,
+                           interactive: Bool = false) -> some View {
+        heliPortGlass(in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous),
+                      interactive: interactive)
+    }
+
+    /// Primary action button: Liquid Glass on macOS 26+, bordered-prominent below it.
+    @ViewBuilder
+    func heliPortProminentButtonStyle() -> some View {
+        if #available(macOS 26.0, *) {
+            self.buttonStyle(.glassProminent)
+        } else {
+            self.buttonStyle(.borderedProminent)
+        }
+    }
+
+    /// Secondary action button: Liquid Glass on macOS 26+, bordered below it.
+    @ViewBuilder
+    func heliPortButtonStyle() -> some View {
+        if #available(macOS 26.0, *) {
+            self.buttonStyle(.glass)
+        } else {
+            self.buttonStyle(.bordered)
+        }
+    }
+}

@@ -169,7 +169,7 @@ class WifiMenuItemViewModern: SelectableMenuItemView, WifiMenuItemView {
             connected = false
             updateImages()
             DispatchQueue.global().async {
-                dis_associate_ssid(self.networkInfo.ssid)
+                Driver.disassociate(ssid: self.networkInfo.ssid)
                 Log.debug("Disconnected from \(self.networkInfo.ssid)")
             }
         } else {

@@ -7128,6 +7128,9 @@
         }
       }
     },
+    "Relaunch" : {
+
+    },
     "Remember this network" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7556,6 +7559,9 @@
           }
         }
       }
+    },
+    "Run without the itlwm driver using simulated Wi-Fi data." : {
+
     },
     "Saved Networks:" : {
       "extractionState" : "manual",
@@ -8117,6 +8123,9 @@
           }
         }
       }
+    },
+    "Simulation Mode" : {
+
     },
     "Switching appearance requires a restart of the application to take effect." : {
       "extractionState" : "manual",
@@ -8949,6 +8958,9 @@
           }
         }
       }
+    },
+    "Using simulated Wi-Fi data - no itlwm driver required." : {
+
     },
     "verify your credentials to show the stored password" : {
       "extractionState" : "manual",
