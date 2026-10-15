@@ -51,56 +51,49 @@ class StatusBarIcon {
     }
 
     func on() {
-        stopTimer()
-        disconnected()
+        setImage(icons.disconnected)
     }
 
     func off() {
-        stopTimer()
-        statusBar.button?.image = icons.off
+        setImage(icons.off)
     }
 
     func connected() {
-        stopTimer()
-        statusBar.button?.image = icons.connected
+        setImage(icons.connected)
     }
 
     func disconnected() {
-        stopTimer()
-        statusBar.button?.image = icons.disconnected
+        setImage(icons.disconnected)
     }
 
     func connecting() {
-        guard timer == nil else { return }
-        tickIndex = 0
-        tickDirection = 1
-        DispatchQueue.global(qos: .default).async {
-            self.timer = Timer.scheduledTimer(
-                timeInterval: 0.3,
-                target: self,
-                selector: #selector(self.tick),
-                userInfo: nil,
-                repeats: true
-            )
-            self.timer?.fire()
-            RunLoop.current.add(self.timer!, forMode: .common)
-            RunLoop.current.run()
+        perform {
+            // A connection attempt may be reported by several sources at once
+            // (the connect call and the periodic state poll). Keep a single timer
+            // so a later `connected()`/`signalStrength()` always cancels it.
+            guard self.timer == nil else { return }
+            self.tickIndex = 0
+            self.tickDirection = 1
+            let timer = Timer(timeInterval: 0.3, repeats: true) { [weak self] _ in
+                self?.tick()
+            }
+            // .common keeps the animation running while the menu is open.
+            RunLoop.main.add(timer, forMode: .common)
+            self.timer = timer
+            timer.fire()
         }
     }
 
     func warning() {
-        stopTimer()
-        statusBar.button?.image = icons.warning
+        setImage(icons.warning)
     }
 
     func error() {
-        stopTimer()
-        statusBar.button?.image = #imageLiteral(resourceName: "WiFiStateError")
+        setImage(#imageLiteral(resourceName: "WiFiStateError"))
     }
 
     func signalStrength(rssi: Int16) {
-        stopTimer()
-        statusBar.button?.image = icons.getRssiImage(rssi)
+        setImage(icons.getRssiImage(rssi))
     }
 
     func getRssiImage(rssi: Int16) -> NSImage? {
@@ -108,29 +101,47 @@ class StatusBarIcon {
     }
 
     func updateStatusText(_ text: String?) {
-        DispatchQueue.main.async {
+        perform {
             self.statusBar.button?.title = text ?? ""
             // Ensure image and text have appropriate spacing
             self.statusBar.button?.imagePosition = (text == nil || text?.isEmpty == true) ? .imageOnly : .imageLeft
         }
     }
 
-    @objc private func tick() {
-        DispatchQueue.main.async {
-            if let transition = self.icons.transition {
-                self.statusBar.button?.layer?.add(transition, forKey: kCATransition)
-            }
-            self.statusBar.button?.image = self.icons.scanning[self.tickIndex]
+    /// Cancels the animation and applies `image` on the main thread.
+    ///
+    /// Every state change is enqueued on the main queue in call order, so the
+    /// animation timer can never outlive the state that started it regardless of
+    /// which thread the caller is on.
+    private func setImage(_ image: NSImage?) {
+        perform {
+            self.stopTimer()
+            self.statusBar.button?.image = image
+        }
+    }
 
-            self.tickIndex += self.tickDirection
-            if self.tickIndex == 0 || self.tickIndex == self.icons.scanning.endIndex - 1 {
-                self.tickDirection *= -1
-            }
+    @objc private func tick() {
+        if let transition = self.icons.transition {
+            self.statusBar.button?.layer?.add(transition, forKey: kCATransition)
+        }
+        self.statusBar.button?.image = self.icons.scanning[self.tickIndex]
+
+        self.tickIndex += self.tickDirection
+        if self.tickIndex == 0 || self.tickIndex == self.icons.scanning.endIndex - 1 {
+            self.tickDirection *= -1
         }
     }
 
     private func stopTimer() {
         timer?.invalidate()
         timer = nil
+    }
+
+    private func perform(_ block: @escaping () -> Void) {
+        if Thread.isMainThread {
+            block()
+        } else {
+            DispatchQueue.main.async(execute: block)
+        }
     }
 }
