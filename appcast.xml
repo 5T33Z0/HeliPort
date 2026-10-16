@@ -3,23 +3,22 @@
     <channel>
         <title>HeliPort</title>
         <item>
-            <title>2.5.1</title>
-            <pubDate>Thu, 15 Oct 2026 14:12:44 +0000</pubDate>
-            <sparkle:version>369</sparkle:version>
-            <sparkle:shortVersionString>2.5.1</sparkle:shortVersionString>
+            <title>2.6</title>
+            <pubDate>Fri, 16 Oct 2026 07:41:31 +0000</pubDate>
+            <sparkle:version>372</sparkle:version>
+            <sparkle:shortVersionString>2.6</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
             <description><![CDATA[
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/19.4.0/primer.min.css"><meta charset="UTF-8">
                 <div class="markdown-body">
                     <h3>The latest updates are:</h3>
                     <ul>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/5e26e23d867ca94e0cc3fc53c91dc52d112bb93d"><tt>5e26e23</tt></a> update version</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/a07403768fb065fc50ba3205113ef4d1e79f5f15"><tt>a074037</tt></a> Merge remote-tracking branch &apos;refs/remotes/origin/master&apos;</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/d808c2bea2dc0c3b34c47c274b79359ae11eb872"><tt>d808c2b</tt></a> Fix Dev Team issue</li>
+                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/b8b95582ec35aed735fbd38be0598af516efa706"><tt>b8b9558</tt></a> Merge remote-tracking branch &apos;refs/remotes/origin/master&apos;</li>
+                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/3ad7b4ed22613062be96dac58ceb3dc3711a618a"><tt>3ad7b4e</tt></a> Fix Connecting to WiFi issues.</li>
                     </ul>
                 </div>
             ]]></description>
-            <enclosure url="https://github.com/bigj42/heliport/releases/download/v2.5.1/HeliPort.dmg" type="application/octet-stream" sparkle:edSignature="fzrE8wMps4ciHS9ItEf1qGQ86l/wrLJUUftzrgdl+20rlHA71bwcyXMOgnjU6OmnJB96kyX1HXg6jRbraPLiAg==" length="2129490"/>
+            <enclosure url="https://github.com/bigj42/heliport/releases/download/v2.6/HeliPort.dmg" type="application/octet-stream" sparkle:edSignature="HA1WzPEo7InDSYchjRvwDjVD2eokPlTZLb8AMLATw9Sbfrp3O2FNS+FBuSciqxlleKznqHtS4M2KEwDdfyDFDg==" length="2133731"/>
         </item>
     </channel>
 </rss>
