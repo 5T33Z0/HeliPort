@@ -3,37 +3,23 @@
     <channel>
         <title>HeliPort</title>
         <item>
-            <title>2.5</title>
-            <pubDate>Thu, 15 Oct 2026 09:43:26 +0000</pubDate>
-            <sparkle:version>365</sparkle:version>
-            <sparkle:shortVersionString>2.5</sparkle:shortVersionString>
+            <title>2.5.1</title>
+            <pubDate>Thu, 15 Oct 2026 14:12:44 +0000</pubDate>
+            <sparkle:version>369</sparkle:version>
+            <sparkle:shortVersionString>2.5.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
             <description><![CDATA[
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/19.4.0/primer.min.css"><meta charset="UTF-8">
                 <div class="markdown-body">
                     <h3>The latest updates are:</h3>
                     <ul>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/9bfb3d51a212cb5d0a09dc16d30c9113fd2fd14d"><tt>9bfb3d5</tt></a> Merge branch &apos;master&apos; of https://github.com/joshcalvert47/HeliPort</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/1d987fe9b5d135040a7a128653452c5d266306af"><tt>1d987fe</tt></a> fix version</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/2dc1f6e4a511306bc9d4026d504b7f102ff5fe3d"><tt>2dc1f6e</tt></a> chore: update appcast.xml [skip ci]</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/6db03cc195394f50f66b536d73f65ac5c1fcafb5"><tt>6db03cc</tt></a> update version</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/544b5dd7851beb29f3e496957cb5fca4ddb6575f"><tt>544b5dd</tt></a> Merge branch &apos;master&apos; of https://github.com/joshcalvert47/HeliPort</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/3185d197941bf483253a48fc76d53e6f2e4b80af"><tt>3185d19</tt></a> Simulated WiFi Driver</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/9fe6174ebf48aecb7bc6caa54f13445173cc63ca"><tt>9fe6174</tt></a> Update the UI and fix issues</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/2a3049203c6a491fc8c3fc8cf39a2fe78cdb5d37"><tt>2a30492</tt></a> chore: update appcast.xml [skip ci]</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/fba3a7f0c99b7c7fdf98a6a338ad560a838a71bb"><tt>fba3a7f</tt></a> Update README.md</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/ca524f9d524e33de8b3a58177e8e6a7f54c29f9f"><tt>ca524f9</tt></a> Update Credits</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/d33b5a197d06223dc5952dd1e749a2b9a0508754"><tt>d33b5a1</tt></a> chore: update appcast.xml [skip ci]</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/25907d6e7ef78d8c432441a681f657e149e57970"><tt>25907d6</tt></a> Fix link to itlwm GitHub repository</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/a0f354361d2e619aedddbe74b4a1b0ff75280658"><tt>a0f3543</tt></a> chore: update appcast.xml [skip ci]</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/ed305a05837493309c9b89c33ecc1cb9ca6b0b5d"><tt>ed305a0</tt></a> Merge pull request #4 from perez987/master</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/1a1567c0b5f258803c0a235eff502a09c8b51991"><tt>1a1567c</tt></a> Add localized Credits.rtf and update project</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/7d2d57a0b95498219359d52a577b8a7e057ae20f"><tt>7d2d57a</tt></a> Update config and prefs window widths</li>
-                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/1d7fd7b926c9c1de22f9e8599079acd706a8bf03"><tt>1d7fd7b</tt></a> Update prefs window, app icons, and UI icons</li>
+                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/5e26e23d867ca94e0cc3fc53c91dc52d112bb93d"><tt>5e26e23</tt></a> update version</li>
+                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/a07403768fb065fc50ba3205113ef4d1e79f5f15"><tt>a074037</tt></a> Merge remote-tracking branch &apos;refs/remotes/origin/master&apos;</li>
+                    <li><a class="commit-link" href="https://github.com/bigj42/heliport/commit/d808c2bea2dc0c3b34c47c274b79359ae11eb872"><tt>d808c2b</tt></a> Fix Dev Team issue</li>
                     </ul>
                 </div>
             ]]></description>
-            <enclosure url="https://github.com/bigj42/heliport/releases/download/v2.5/HeliPort.dmg" type="application/octet-stream" sparkle:edSignature="uv62kSLbfJg0LXUGBwybvtjs2PBEQsYj1EIbtoN0p/7PmHCSP692wFhHKyO1nsX07TLaHt1dzjKUpsIBP71gAw==" length="2129522"/>
+            <enclosure url="https://github.com/bigj42/heliport/releases/download/v2.5.1/HeliPort.dmg" type="application/octet-stream" sparkle:edSignature="fzrE8wMps4ciHS9ItEf1qGQ86l/wrLJUUftzrgdl+20rlHA71bwcyXMOgnjU6OmnJB96kyX1HXg6jRbraPLiAg==" length="2129490"/>
         </item>
     </channel>
 </rss>
