@@ -21,6 +21,7 @@ public extension String {
         static let showBitrateInMenuBar = "showBitrateInMenuBar"
         static let showSignalAsPercentage = "showSignalAsPercentage"
         static let hasPromptedForLaunchAtLogin = "hasPromptedForLaunchAtLogin"
+        static let hasReportedKeychainFailure = "hasReportedKeychainFailure"
     }
 
     init<T>(ssid: T) {

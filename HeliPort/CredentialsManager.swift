@@ -23,8 +23,33 @@ final class CredentialsManager {
     private let ssidCache: NSCache = NSCache<NSString, NSSet>()
     private let ssidCacheKey = NSString("savedSSIDs")
 
+    /// The last error macOS returned when reading the keychain, if it was
+    /// anything other than "no such item".
+    private(set) var lastAccessError: Error?
+
     private init() {
         keychain = Keychain(service: Bundle.main.bundleIdentifier!)
+    }
+
+    /// Checks that HeliPort can read its own keychain items.
+    ///
+    /// macOS binds a keychain item to the code signature that created it, so a
+    /// build signed with a different identity — an ad-hoc signed build
+    /// (`CODE_SIGN_IDENTITY=-`) is a different identity after every rebuild —
+    /// can be refused access to the credentials a previous build saved. Those
+    /// reads fail with an error, but without this check they are
+    /// indistinguishable from "the user never saved a network".
+    @discardableResult
+    func verifyAccess() -> Bool {
+        do {
+            _ = try keychain.allKeys()
+            lastAccessError = nil
+            return true
+        } catch {
+            lastAccessError = error
+            Log.error("Keychain is not readable: \(error)")
+            return false
+        }
     }
 
     func save(_ network: NetworkInfo) {
@@ -63,6 +88,7 @@ final class CredentialsManager {
     func remove(_ network: NetworkInfo) {
         Log.debug("Removing \(network.ssid) from keychain")
         try? keychain.remove(network.keychainKey)
+        ssidCache.removeObject(forKey: ssidCacheKey)
     }
 
     func getStorageFromSsid(_ ssid: String) -> NetworkInfoStorageEntity? {

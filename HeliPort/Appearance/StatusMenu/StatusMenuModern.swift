@@ -297,14 +297,12 @@ final class StatusMenuModern: StatusMenuBase, StatusMenuItems {
                                  hidden: Bool = false,
                                  networkInfo: NetworkInfo = NetworkInfo(ssid: "placeholder")) -> NSMenuItem {
 
-        let newItem = ModernNetworkMenuItem(
-            ssid: networkInfo.ssid,
-            signalStrength: Int(networkInfo.rssi),
-            isConnected: false,
-            isSecure: networkInfo.auth.security != ITL80211_SECURITY_NONE
-        ) {
-            NetworkManager.connect(networkInfo: networkInfo, saveNetwork: true)
-            self.cancelTracking()
+        // The row is reused for other networks as scans come in, so the handler
+        // receives the network the row is displaying at click time.
+        let newItem = ModernNetworkMenuItem(networkInfo: networkInfo) { [weak self] selected in
+            Log.debug("Selected \(selected.ssid) from the status menu")
+            NetworkManager.connect(networkInfo: selected, saveNetwork: true)
+            self?.cancelTracking()
         }
 
         newItem.isHidden = hidden

@@ -244,6 +244,16 @@ enum SimulatedWiFi {
         defer { lock.unlock() }
         guard powered else { return false }
 
+        // A real station cannot associate with a protected network without a
+        // credential, so neither does the simulation: always reporting success
+        // made HeliPort claim it had joined a secured network it never
+        // authenticated to.
+        let security = knownNetworks.first(where: { $0.ssid == ssid })?.security ?? ITL80211_SECURITY_WPA2_PERSONAL
+        guard security == ITL80211_SECURITY_NONE || !password.isEmpty else {
+            Log.debug("Simulated driver needs a password for \(ssid)")
+            return false
+        }
+
         connectedSSID = ssid
         currentState = ITL80211_S_RUN
         rssiValue = Int16(knownNetworks.first(where: { $0.ssid == ssid })?.rssi ?? -60)

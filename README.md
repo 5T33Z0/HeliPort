@@ -34,6 +34,39 @@ HeliPort has been upgraded, providing a state-of-the-art premium experience for 
 
 Visit [Projects](https://github.com/OpenIntelWireless/HeliPort/projects) for more information.
 
+## Building locally (code signing)
+
+Local builds are signed with a self-signed certificate called **HeliPort Local Dev** so that
+every build carries the same code identity. macOS only lets code with the same identity read the
+keychain items it wrote itself, and an ad-hoc signature (`CODE_SIGN_IDENTITY=-`) is a different
+identity after every rebuild — saved Wi-Fi passwords then become unreadable and the app starts
+asking for them again.
+
+The certificate lives in your login keychain, and the project uses it directly
+(`CODE_SIGN_IDENTITY = "HeliPort Local Dev"`, `CODE_SIGN_STYLE = Manual`, no development team).
+To recreate it on another Mac:
+
+```sh
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -days 3650 \
+  -subj "/CN=HeliPort Local Dev/OU=HeliPort/O=HeliPort Local Development" \
+  -addext "keyUsage=critical,digitalSignature" \
+  -addext "extendedKeyUsage=critical,codeSigning" \
+  -addext "basicConstraints=critical,CA:false" \
+  -keyout heliPort-key.pem -out heliPort-cert.pem
+openssl pkcs12 -export -out heliPort.p12 -inkey heliPort-key.pem -in heliPort-cert.pem \
+  -name "HeliPort Local Dev" -passout pass:password
+security import heliPort.p12 -k ~/Library/Keychains/login.keychain-db -P password -T /usr/bin/codesign
+security add-trusted-cert -r trustRoot -p codeSign -k ~/Library/Keychains/login.keychain-db heliPort-cert.pem
+```
+
+`ENABLE_HARDENED_RUNTIME` is `NO` for local builds: library validation needs a Team ID, which a
+self-signed certificate does not have, so embedded binaries (the debug dylib, Sparkle) cannot be
+loaded with the hardened runtime enabled. Turn it back on when builds are signed with an Apple
+Development or Developer ID identity.
+
+CI is unaffected: it passes `CODE_SIGN_IDENTITY="-"` on the `xcodebuild` command line, which
+overrides the project setting.
+
 ## Issues
 
 Issues for this project are for bug tracking only, please carefully fill in all the blanks in the correct Issue Template.

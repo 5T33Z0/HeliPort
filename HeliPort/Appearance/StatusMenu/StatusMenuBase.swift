@@ -567,7 +567,8 @@ class StatusMenuBase: NSMenu, NSMenuDelegate {
                 if let wifiMenuItemView = item.view as? WifiMenuItemView {
                     wifiMenuItemView.networkInfo = info
                 } else if #available(macOS 11, *), let modernItem = item as? ModernNetworkMenuItem {
-                    modernItem.update(with: info)
+                    // `enabled` is false for the network we are already associated with
+                    modernItem.update(with: info, isConnected: !enabled)
                 }
             } else {
                 // Add new item if not enough existing ones

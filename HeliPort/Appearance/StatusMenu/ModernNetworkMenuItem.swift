@@ -74,39 +74,53 @@ struct NetworkItemView: View {
 
 // Helper for hosting in NSMenu
 class ModernNetworkMenuItem: NSMenuItem {
-    private var onSelect: () -> Void = {}
 
-    init(ssid: String, signalStrength: Int, isConnected: Bool, isSecure: Bool, onSelect: @escaping () -> Void) {
+    /// The network this row currently represents.
+    ///
+    /// `StatusMenuBase` reuses rows between scans, so a row can be showing a
+    /// different network than the one it was created for. The click handler has
+    /// to read this property at click time; capturing a `NetworkInfo` when the
+    /// row is built makes a reused row connect to the wrong network.
+    private(set) var networkInfo: NetworkInfo
+    private var isConnected: Bool
+    private var onSelect: (NetworkInfo) -> Void
+
+    init(networkInfo: NetworkInfo, isConnected: Bool = false, onSelect: @escaping (NetworkInfo) -> Void) {
+        self.networkInfo = networkInfo
+        self.isConnected = isConnected
         self.onSelect = onSelect
-        super.init(title: ssid, action: #selector(itemAction), keyEquivalent: "")
+
+        super.init(title: networkInfo.ssid, action: #selector(itemAction), keyEquivalent: "")
         self.target = self
 
-        let view = NetworkItemView(
-            ssid: ssid,
-            signalStrength: signalStrength,
-            isConnected: isConnected,
-            isSecure: isSecure,
-            onSelect: onSelect
-        )
-        self.view = NSHostingView(rootView: view)
+        self.view = NSHostingView(rootView: makeView())
         // Adjust frame to fit menu
         self.view?.frame = NSRect(x: 0, y: 0, width: HeliPortUI.Dashboard.width, height: 40)
     }
 
+    private func makeView() -> NetworkItemView {
+        NetworkItemView(
+            ssid: networkInfo.ssid,
+            signalStrength: Int(networkInfo.rssi),
+            isConnected: isConnected,
+            isSecure: networkInfo.auth.security != ITL80211_SECURITY_NONE,
+            onSelect: { [weak self] in
+                guard let self = self, self.isEnabled else { return }
+                self.onSelect(self.networkInfo)
+            }
+        )
+    }
+
     @objc private func itemAction() {
-        onSelect()
+        guard isEnabled else { return }
+        onSelect(networkInfo)
     }
 
     func update(with info: NetworkInfo, isConnected: Bool = false) {
+        self.networkInfo = info
+        self.isConnected = isConnected
         self.title = info.ssid
-        let newView = NetworkItemView(
-            ssid: info.ssid,
-            signalStrength: Int(info.rssi),
-            isConnected: isConnected,
-            isSecure: info.auth.security != ITL80211_SECURITY_NONE,
-            onSelect: self.onSelect
-        )
-        (self.view as? NSHostingView<NetworkItemView>)?.rootView = newView
+        (self.view as? NSHostingView<NetworkItemView>)?.rootView = makeView()
     }
 
     required init(coder: NSCoder) {

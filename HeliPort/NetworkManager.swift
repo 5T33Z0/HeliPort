@@ -26,8 +26,21 @@ final class NetworkManager {
         ITL80211_SECURITY_PERSONAL
     ]
 
+#if DEBUG
+    /// Set by the status menu self test to observe which network a menu click
+    /// asks for without touching the driver or the keychain.
+    static var connectObserver: ((NetworkInfo) -> Void)?
+#endif
+
     static func connect(networkInfo: NetworkInfo, saveNetwork: Bool = false,
                         _ callback: ((_ result: Bool) -> Void)? = nil) {
+
+#if DEBUG
+        if let connectObserver = connectObserver {
+            connectObserver(networkInfo)
+            return
+        }
+#endif
 
         guard supportedSecurityMode.contains(networkInfo.auth.security) else {
             let alert = Alert(text: NSLocalizedString("Network security not supported: ")

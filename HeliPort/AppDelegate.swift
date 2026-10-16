@@ -40,9 +40,48 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let iconProvider = StatusBarIconModern()
         _ = StatusBarIcon.shared(statusBar: statusBar, icons: iconProvider)
 
-        statusBar.menu = StatusMenuModern()
+        let statusMenu = StatusMenuModern()
+        statusBar.menu = statusMenu
 
+#if DEBUG
+        if StatusMenuSelfTest.isRequested {
+            exit(StatusMenuSelfTest.run(menu: statusMenu))
+        }
+#endif
+
+        verifySavedCredentials()
         promptForLaunchAtLogin()
+    }
+
+    /// macOS only lets code with the same signature read the keychain items it
+    /// wrote earlier, so a build signed with a different identity (for example
+    /// an ad-hoc signed build, whose identity changes on every rebuild) cannot
+    /// read the networks a previous build saved. Those reads fail, which is
+    /// indistinguishable from "nothing was ever saved" unless it is reported.
+    private func verifySavedCredentials() {
+        DispatchQueue.global(qos: .background).async {
+            guard !CredentialsManager.instance.verifyAccess() else { return }
+
+            DispatchQueue.main.async {
+                guard !UserDefaults.standard.bool(forKey: .DefaultsKey.hasReportedKeychainFailure) else {
+                    return
+                }
+                UserDefaults.standard.set(true, forKey: .DefaultsKey.hasReportedKeychainFailure)
+
+                let alert = NSAlert()
+                alert.alertStyle = .warning
+                alert.messageText = NSLocalizedString("Saved Wi-Fi passwords are unavailable")
+                alert.informativeText = NSLocalizedString(
+                    "macOS only allows a build to read the keychain items written by code with the "
+                    + "same signature. This copy of HeliPort no longer matches the build that saved "
+                    + "your networks, so they are treated as new. Signing every build with the same "
+                    + "identity — an Apple Development certificate instead of an ad-hoc signature — "
+                    + "keeps saved networks available."
+                )
+                alert.addButton(withTitle: NSLocalizedString("OK"))
+                alert.runModal()
+            }
+        }
     }
 
     private func checkDriver() -> Bool {
